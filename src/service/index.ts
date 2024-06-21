@@ -1,11 +1,12 @@
 export interface DataType {
-  id?: string;
-  username?: string;
-  age?: number;
+  id: string;
+  username: string;
+  age: number;
   address?: string;
-  phone?: number;
-  createTime?: number;
-  modifiedTime?: number;
+  phone: number;
+  createTime: number;
+  modifiedTime: number;
+  password?: string;
 }
 
 let data: DataType[] = [];
@@ -17,6 +18,7 @@ for (let index = 0; index < 20; index++) {
     age: 11,
     address: 'address',
     phone: 18366666666,
+    password: '18366666666',
     createTime: new Date().valueOf(),
     modifiedTime: new Date().valueOf(),
   });

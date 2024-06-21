@@ -1,17 +1,20 @@
+import { DataType } from '@/service';
+import { ActionType } from '@/utils';
 import { Form, FormProps, Input, InputNumber, Modal, ModalProps } from 'antd';
 
 interface IProps {
 	modalProps?: ModalProps
 	formProps?: FormProps
+	actionType?: ActionType
 }
 
 const RegisterModal: React.FC<IProps> = (props) => {
-	const { modalProps, formProps } = props;
+	const { modalProps, formProps, actionType } = props;
 
 	return <Modal
 		{...modalProps}
 	>
-		<Form
+		<Form<DataType>
 			name="basic"
 			labelCol={{ span: 4 }}
 			wrapperCol={{ span: 20 }}
@@ -62,44 +65,47 @@ const RegisterModal: React.FC<IProps> = (props) => {
 			>
 				<InputNumber style={{ width: '100%' }} placeholder="请输入年龄" />
 			</Form.Item>
-
-			<Form.Item
-				label="密码"
-				name="password"
-				rules={[
-					{ required: true, message: '请输入密码!' },
-					{
-						min: 6,
-						max: 18,
-						message: '密码长度必须在6到18个字符之间！',
-					},
-				]}
-			>
-				<Input.Password placeholder="请输入密码" />
-			</Form.Item>
-
-			<Form.Item
-				name="confirm"
-				label="确认密码"
-				dependencies={['password']}
-				hasFeedback
-				rules={[
-					{
-						required: true,
-						message: '请输入密码!',
-					},
-					({ getFieldValue }) => ({
-						validator(_, value) {
-							if (!value || getFieldValue('password') === value) {
-								return Promise.resolve();
-							}
-							return Promise.reject(new Error('您输入的两个密码不一致!'));
+			{
+				actionType === 'Create' && <Form.Item
+					label="密码"
+					name="password"
+					rules={[
+						{ required: true, message: '请输入密码!' },
+						{
+							min: 6,
+							max: 18,
+							message: '密码长度必须在6到18个字符之间！',
 						},
-					}),
-				]}
-			>
-				<Input.Password placeholder="请输入确认密码" />
-			</Form.Item>
+					]}
+				>
+					<Input.Password placeholder="请输入密码" />
+				</Form.Item>
+			}
+			{
+				actionType === 'Create' && <Form.Item
+					name="confirm"
+					label="确认密码"
+					dependencies={['password']}
+					hasFeedback
+					rules={[
+						{
+							required: true,
+							message: '请输入密码!',
+						},
+						({ getFieldValue }) => ({
+							validator(_, value) {
+								if (!value || getFieldValue('password') === value) {
+									return Promise.resolve();
+								}
+								return Promise.reject(new Error('您输入的两个密码不一致!'));
+							},
+						}),
+					]}
+				>
+					<Input.Password placeholder="请输入确认密码" />
+				</Form.Item>
+			}
+
 
 			<Form.Item
 				name="address"

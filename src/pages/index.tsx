@@ -4,12 +4,11 @@ import moment from 'moment';
 import { Button, Table, Form, message, Space, Popconfirm, ConfigProvider } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { createUsers, DataType, queryUsers, deleteUsers, updateUsers } from '@/service';
-import { useModalState } from '@/utils';
+import { ActionType, useModalState } from '@/utils';
+import zh_CN from 'antd/es/locale/zh_CN';
+import md5 from 'md5';
 import RegisterModal from './RegisterModal';
 import style from './index.less';
-import zh_CN from 'antd/es/locale/zh_CN';
-
-type ActionType = 'Create' | 'Read' | 'Update';
 
 const action_map = {
   Create: {
@@ -28,6 +27,7 @@ export default function IndexPage() {
   const [form] = Form.useForm();
 
   const [actionType, setActionType] = useState<ActionType | null>(null);
+
   const [state, { showModal, hideModal }] = useModalState(false);
 
   const { tableProps, refresh } = useAntdTable(queryUsers);
@@ -113,7 +113,7 @@ export default function IndexPage() {
       render: (_, record) => (
         <Space size="middle">
           {
-            Object.entries(action_map).filter(el => el[0] !== 'Create').map(([key, val]) => <a onClick={() => {
+            Object.entries(action_map).filter(el => el[0] !== 'Create').map(([key, val]) => <a key={key} onClick={() => {
               setActionType(key as ActionType);
               showModal();
               form.setFieldsValue(record);
@@ -142,6 +142,10 @@ export default function IndexPage() {
 
   const onOk = () => {
     form.validateFields().then(res => {
+      //删除确认密码字段
+      delete res.confirm;
+      //对密码进行加密
+      res.password = md5(res.password);
       (actionType === 'Create' ? createReq : updateReq).run(res);
     });
   }
@@ -155,11 +159,13 @@ export default function IndexPage() {
       <div className={style.page}>
         <Button type="primary" style={{ marginBottom: 16 }} onClick={onButtonClick}>注册用户</Button>
         <Table
+          scroll={{ x: 1200 }}
           rowKey="id"
           columns={columns}
           {...tableProps}
         />
         <RegisterModal
+          actionType={actionType!}
           formProps={{
             disabled: actionType === 'Read',
             form,
